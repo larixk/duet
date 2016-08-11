@@ -15,9 +15,9 @@ const drawLine = (color, alpha, thickness, fromX, fromY, toX, toY) => {
   ctx.beginPath();
   ctx.moveTo(fromX, fromY);
   const colors = [
-    `rgba(0,0,0,${alpha})`,
+    `rgba(0,0,0,${alpha * 0.3})`,
     `rgba(255,255,255,${alpha})`,
-    `rgba(128,128,128,${alpha})`
+    `rgba(255,255,255,${alpha})`
   ]
   ctx.strokeStyle = colors[color];
   ctx.lineWidth = thickness;
@@ -37,7 +37,6 @@ const update = (index) => {
   const startX = walker.x;
   const startY = walker.y;
 
-  // walker.angle += (Math.random() - 0.5) * lerp(1 - peak, 1, 0.5);
   walker.angle += lerp(Math.pow(peak, 20), 0, 0.8);
   walker.x += Math.cos(walker.angle) * speed;
   walker.y += Math.sin(walker.angle) * speed;
@@ -50,27 +49,33 @@ const update = (index) => {
 
 let rotate = 0;
 let scale = 1;
+let flameDirection = 0;
+let flameSize = 1;
+
 const tick = () => {
   requestAnimationFrame(tick);
 
+  flameDirection -= 0.01;
+  const flameX = Math.cos(flameDirection) * flameSize;
+  const flameY = Math.sin(flameDirection) * flameSize;
+
   ctx.translate(canvas.width / 2, canvas.height / 2);
-  rotate += (Math.random() - 0.5) * 0.01;
   rotate = 0.01;
-  scale += (Math.random() - 0.5) * 0.001;
+  scale += (Math.random() - 0.5) * 0.003 * (1 - analyser.frequencies(undefined, 0).reduce(sum) / (1024 * 255));
   scale = Math.min(1.01, Math.max(0.99, scale));
   ctx.scale(scale, scale);
   ctx.rotate(rotate);
   ctx.globalAlpha = 0.99;
-  ctx.translate(0, -1);
+  ctx.translate(flameX, flameY);
   ctx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
-  ctx.translate(0, 1);
-  // ctx.drawImage(canvas, 0, 0);
+  ctx.translate(-flameX, -flameY);
   ctx.globalAlpha = 1;
   ctx.rotate(-rotate);
   ctx.scale(1/scale, 1/scale);
   ctx.translate(-canvas.width / 2, -canvas.height / 2);
 
-  drawLine(2, 0.1, 200, canvas.width / 2 - 10, canvas.height / 2, canvas.width / 2 + 10, canvas.height / 2);
+  drawLine(0, 0.1, 100, canvas.width / 2 - 1, canvas.height / 2, canvas.width / 2 + 1, canvas.height / 2);
+  drawLine(2, 0.1, 90, canvas.width / 2 - 1, canvas.height / 2, canvas.width / 2 + 1, canvas.height / 2);
   twice(update);
 
   ctx.fillStyle = 'rgba(128,128,128,0.01)';
@@ -90,7 +95,7 @@ const init = () => {
 
   const audio = new Audio();
   audio.crossOrigin = 'Anonymous';
-  audio.src = '/test.mp3';
+  audio.src = 'test.mp3';
 
   analyser = webAudioAnalyser(audio, {
     stereo: true,
@@ -105,5 +110,6 @@ const init = () => {
   }));
   tick();
 };
+
 
 init();
