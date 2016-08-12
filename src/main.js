@@ -1,11 +1,13 @@
 import autoscale from 'canvas-autoscale';
 import webAudioAnalyser from 'web-audio-analyser';
 import { max, sum, lerp, twice } from './util.js';
+import particles from './particles.js';
 
 let walkers;
 let analyser;
 let ctx;
 let canvas;
+
 
 const drawLine = (color, alpha, thickness, fromX, fromY, toX, toY) => {
   ctx.beginPath();
@@ -58,6 +60,8 @@ const flameSize = 1;
 
 const tick = () => {
   requestAnimationFrame(tick);
+
+  particles(Math.random() * canvas.width, Math.random() * canvas.height);
 
   flameDirection += 0.02;
   const flameX = Math.cos(flameDirection) * flameSize;
