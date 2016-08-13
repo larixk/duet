@@ -8,4 +8,10 @@ export const distanceBetween = (p1, p2) => Math.sqrt(
   Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)
 );
 
-export const twice = (f) => [0, 1].map(f);
+export const times = (count, f) => {
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    results.push(f(i));
+  }
+  return results;
+};

@@ -1,6 +1,6 @@
 import autoscale from 'canvas-autoscale';
 import webAudioAnalyser from 'web-audio-analyser';
-import { max, sum, lerp, twice } from './util.js';
+import { max, sum, lerp, times } from './util.js';
 import particles from './particles.js';
 
 let walkers;
@@ -25,7 +25,7 @@ const drawLine = (color, alpha, thickness, fromX, fromY, toX, toY) => {
 };
 
 const update = (index) => {
-  const frequencies = analyser.frequencies(undefined, index);
+  const frequencies = analyser.frequencies(undefined, index % 2);
   const volume = (frequencies.reduce(sum) / (1024 * 255));
   const peak = frequencies.reduce(max) / 255;
   const walker = walkers[index];
@@ -41,8 +41,9 @@ const update = (index) => {
   walker.x = lerp(walker.x, canvas.width / 2, 0.25);
   walker.y = lerp(walker.y, canvas.height / 2, 0.25);
 
+  particles(Math.pow(volume, 1/3), walker.x, walker.y, walker.color);
   drawLine(
-    index,
+    index % 2,
     Math.pow(peak, 2),
     (Math.pow(volume * 10, 1 / 3) * 40) + 10,
     startX,
@@ -56,12 +57,11 @@ const update = (index) => {
 let rotate = 0;
 let scale = 1;
 let flameDirection = 0;
-const flameSize = 1;
+const flameSize = 2;
 
 const tick = () => {
   requestAnimationFrame(tick);
 
-  particles(Math.random() * canvas.width, Math.random() * canvas.height);
 
   flameDirection += 0.02;
   const flameX = Math.cos(flameDirection) * flameSize;
@@ -78,29 +78,29 @@ const tick = () => {
   ctx.translate(flameX, flameY);
 
   ctx.globalCompositeOperation = 'source-over';
-  ctx.globalAlpha = 0.999;
+  ctx.globalAlpha = 0.992;
   ctx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
 
-  ctx.globalCompositeOperation = 'hard-color';
-  ctx.globalAlpha = 0.01;
-  ctx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
+  // ctx.globalCompositeOperation = 'hard-color';
+  // ctx.globalAlpha = 0.01;
+  // ctx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
 
-  let dX;
-  let dY;
-  ctx.globalAlpha = 0.2;
-  ctx.globalCompositeOperation = 'multiply';
-  dX = (Math.random() - 0.5) * 10;
-  dY = (Math.random() - 0.5) * 10;
-  dX = 2;
-  ctx.drawImage(canvas, dX - (canvas.width / 2), dY - (canvas.height / 2));
+  // let dX;
+  // let dY;
+  // ctx.globalAlpha = 0.2;
+  // ctx.globalCompositeOperation = 'multiply';
+  // dX = (Math.random() - 0.5) * 10;
+  // dY = (Math.random() - 0.5) * 10;
+  // dX = 2;
+  // ctx.drawImage(canvas, dX - (canvas.width / 2), dY - (canvas.height / 2));
 
 
-  ctx.globalAlpha = 0.19;
-  ctx.globalCompositeOperation = 'screen';
-  dX = (Math.random() - 0.5) * 10;
-  dY = (Math.random() - 0.5) * 10;
-  dX = -2;
-  ctx.drawImage(canvas, dX - (canvas.width / 2), dY - (canvas.height / 2));
+  // ctx.globalAlpha = 0.2;
+  // ctx.globalCompositeOperation = 'screen';
+  // dX = (Math.random() - 0.5) * 10;
+  // dY = (Math.random() - 0.5) * 10;
+  // dX = -2;
+  // ctx.drawImage(canvas, dX - (canvas.width / 2), dY - (canvas.height / 2));
 
   ctx.translate(-flameX, -flameY);
   ctx.rotate(-rotate);
@@ -128,9 +128,9 @@ const tick = () => {
     (canvas.width / 2) + 1,
     canvas.height / 2
   );
-  twice(update);
+  times(walkers.length, update);
 
-  ctx.fillStyle = 'rgba(128,128,128,0.01)';
+  ctx.fillStyle = 'rgba(128,128,128,0.008)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 };
 
@@ -154,11 +154,11 @@ const init = () => {
   });
 
   audio.play();
-  walkers = twice((i) => ({
+  walkers = times(2, (i) => ({
     x: window.innerWidth / 2,
     y: window.innerHeight / 2,
-    angle: Math.PI * 1.5,
-    color: `rgb(${i * 255},${i * 255},${i * 255})`,
+    angle: Math.PI * 1.5 * Math.random(),
+    color: `rgb(${(i % 2) * 255},${(i % 2) * 255},${(i % 2) * 255})`,
   }));
   tick();
 };
