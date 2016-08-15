@@ -25,7 +25,7 @@ const drawLine = (color, alpha, thickness, fromX, fromY, toX, toY) => {
 };
 
 const update = (index) => {
-  const frequencies = analyser.frequencies(undefined, index % 2);
+  const frequencies = analyser.frequencies(undefined, (index + 1) % 2);
   const volume = (frequencies.reduce(sum) / (1024 * 255));
   const peak = frequencies.reduce(max) / 255;
   const walker = walkers[index];
@@ -41,7 +41,7 @@ const update = (index) => {
   walker.x = lerp(walker.x, canvas.width / 2, 0.25);
   walker.y = lerp(walker.y, canvas.height / 2, 0.25);
 
-  particles(Math.pow(volume, 1/3), walker.x, walker.y, walker.color);
+  particles(Math.pow(volume, 1/3), walker.x, walker.y, walker.color, canvas);
   drawLine(
     index % 2,
     Math.pow(peak, 2),
@@ -55,7 +55,7 @@ const update = (index) => {
 
 
 let rotate = 0;
-let scale = 1;
+let scale = 0;
 let flameDirection = 0;
 const flameSize = 2;
 
@@ -68,39 +68,20 @@ const tick = () => {
   const flameY = Math.sin(flameDirection) * flameSize;
   const loudness = analyser.frequencies(undefined, 0).reduce(sum) / (1024 * 255);
   ctx.translate(canvas.width / 2, canvas.height / 2);
-  rotate = 0.01;
+  rotate = 0.005;
   scale += (Math.random() - 0.5) *
-    0.003 *
+    0.001 *
     (1 - loudness);
-  scale = Math.min(1.01, Math.max(0.99, scale));
+  scale = Math.min(1.005, Math.max(0.995, scale));
   ctx.scale(scale, scale);
   ctx.rotate(rotate);
   ctx.translate(flameX, flameY);
 
   ctx.globalCompositeOperation = 'source-over';
-  ctx.globalAlpha = 0.992;
+  ctx.imageSmoothingEnabled = false;
+  ctx.globalAlpha = 0.9;
   ctx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
-
-  // ctx.globalCompositeOperation = 'hard-color';
-  // ctx.globalAlpha = 0.01;
-  // ctx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
-
-  // let dX;
-  // let dY;
-  // ctx.globalAlpha = 0.2;
-  // ctx.globalCompositeOperation = 'multiply';
-  // dX = (Math.random() - 0.5) * 10;
-  // dY = (Math.random() - 0.5) * 10;
-  // dX = 2;
-  // ctx.drawImage(canvas, dX - (canvas.width / 2), dY - (canvas.height / 2));
-
-
-  // ctx.globalAlpha = 0.2;
-  // ctx.globalCompositeOperation = 'screen';
-  // dX = (Math.random() - 0.5) * 10;
-  // dY = (Math.random() - 0.5) * 10;
-  // dX = -2;
-  // ctx.drawImage(canvas, dX - (canvas.width / 2), dY - (canvas.height / 2));
+  ctx.imageSmoothingEnabled = true;
 
   ctx.translate(-flameX, -flameY);
   ctx.rotate(-rotate);
@@ -130,8 +111,12 @@ const tick = () => {
   );
   times(walkers.length, update);
 
-  ctx.fillStyle = 'rgba(128,128,128,0.008)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'rgba(0,0,0,1)';
+  ctx.fillRect(10, 0, 1, canvas.height);
+  ctx.fillRect(0, canvas.height - 10, canvas.width, 1);
+  ctx.fillStyle = 'rgba(255,255,255,1)';
+  ctx.fillRect(canvas.width - 10, 0, 1, canvas.height);
+  ctx.fillRect(0, 10, canvas.width, 1);
 };
 
 const init = () => {
