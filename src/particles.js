@@ -14,7 +14,7 @@ autoscale(canvas, {
 
 const tick = () => {
   requestAnimationFrame(tick);
-  // canvas.width = canvas.width;
+  canvas.width = canvas.width;
   particles = particles.filter((particle) => {
     particle.life -= 0.01;
     if (particle.life < 0) {
@@ -53,13 +53,13 @@ export default (amount, x, y, color, newCanvas) => {
     canvas = newCanvas;
     ctx = canvas.getContext('2d');
   }
-  for (let i = 0; i < amount * 10; i++) {
+  for (let i = 0; i < amount * 20; i++) {
     particles.push({
       x, y, color,
       shape: Math.random() > 0.5,
       direction: Math.random() * Math.PI * 2,
       life: Math.random() * amount,
-      speed: 1 + Math.random() * 1,
+      speed: 1 + Math.random() * 5,
     });
   }
 };
