@@ -22,7 +22,7 @@ const tick = () => {
     }
     const { x, y, direction, color, life, shape, speed } = particle;
 
-    particle.direction += (Math.random() - 0.5) * 0.5;
+    particle.direction += (Math.random() - 0.5) * 1;
 
     particle.x += Math.cos(direction) * speed;
     particle.y += Math.sin(direction) * speed;
@@ -53,13 +53,13 @@ export default (amount, x, y, color, newCanvas) => {
     canvas = newCanvas;
     ctx = canvas.getContext('2d');
   }
-  for (let i = 0; i < amount * 20; i++) {
+  for (let i = 0; i < Math.pow(amount, 1.4) * 20; i++) {
     particles.push({
       x, y, color,
       shape: Math.random() > 0.5,
       direction: Math.random() * Math.PI * 2,
-      life: Math.random() * amount,
-      speed: 1 + Math.random() * 5,
+      life: Math.random() * amount * 2,
+      speed: 1 + Math.random() * 10,
     });
   }
 };

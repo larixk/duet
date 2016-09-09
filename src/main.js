@@ -30,12 +30,12 @@ const update = (index) => {
   const peak = frequencies.reduce(max) / 255;
   const walker = walkers[index];
 
-  const speed = (Math.pow(volume * 10, 1 / 4) * 80) + 1;
+  const speed = (Math.pow(volume * 10, 1 / 4) * 90);
 
   const startX = walker.x;
   const startY = walker.y;
 
-  walker.angle += lerp(Math.pow(peak, 8), 0, 0.9);
+  walker.angle += lerp(Math.pow(peak, 8), 0, 0.85);
   walker.x += Math.cos(walker.angle) * speed;
   walker.y += Math.sin(walker.angle) * speed;
   walker.x = lerp(walker.x, canvas.width / 2, 0.25);
@@ -45,7 +45,7 @@ const update = (index) => {
   drawLine(
     index % 2,
     Math.pow(peak, 2),
-    (Math.pow(volume * 10, 1 / 3) * 40) + 10,
+    (Math.pow(volume * 10, 1 / 3) * 30),
     startX,
     startY,
     walker.x,
