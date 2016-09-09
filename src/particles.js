@@ -14,7 +14,7 @@ autoscale(canvas, {
 
 const tick = () => {
   requestAnimationFrame(tick);
-  canvas.width = canvas.width;
+  // canvas.width = canvas.width;
   particles = particles.filter((particle) => {
     particle.life -= 0.01;
     if (particle.life < 0) {

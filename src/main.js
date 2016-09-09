@@ -10,13 +10,13 @@ let canvas;
 
 
 const drawLine = (color, alpha, thickness, fromX, fromY, toX, toY) => {
-  ctx.beginPath();
-  ctx.moveTo(fromX, fromY);
   const colors = [
     `rgba(32,32,32,${alpha})`,
     `rgba(255,255,255,${alpha})`,
-    `rgba(0,0,0,${alpha})`,
+    `rgba(128,128,128,${alpha})`,
   ];
+  ctx.beginPath();
+  ctx.moveTo(fromX, fromY);
   ctx.strokeStyle = colors[color];
   ctx.lineWidth = thickness * 2;
   ctx.lineCap = 'round';
@@ -30,19 +30,18 @@ const update = (index) => {
   const peak = frequencies.reduce(max) / 255;
   const walker = walkers[index];
 
-  const speed = (Math.pow(volume * 10, 1 / 4) * 120) + 1;
+  const speed = (Math.pow(volume * 10, 1 / 4) * 80) + 1;
 
   const startX = walker.x;
   const startY = walker.y;
 
-  walker.angle += lerp(Math.pow(peak, 10), 0, 0.8);
+  walker.angle += lerp(Math.pow(peak, 8), 0, 0.9);
   walker.x += Math.cos(walker.angle) * speed;
   walker.y += Math.sin(walker.angle) * speed;
   walker.x = lerp(walker.x, canvas.width / 2, 0.25);
   walker.y = lerp(walker.y, canvas.height / 2, 0.25);
 
-  // particles(Math.pow(volume, 1/3), walker.x, walker.y, walker.color, canvas);
-  particles(Math.pow(volume, 1/3), walker.x, walker.y, walker.color);
+  // particles(Math.pow(volume, 1), walker.x, walker.y, walker.color, canvas);
   drawLine(
     index % 2,
     Math.pow(peak, 2),
@@ -52,6 +51,12 @@ const update = (index) => {
     walker.x,
     walker.y
   );
+  const colors = [
+    'rgba(32,32,32,1)',
+    'rgba(255,255,255,1)',
+    'rgba(0,0,0,1)',
+  ];
+  particles(Math.pow(volume, 1/2), walker.x, walker.y, colors[index % 2], canvas);
 };
 
 
@@ -94,28 +99,28 @@ const tick = () => {
   ctx.globalCompositeOperation = 'source-over';
   ctx.globalAlpha = 1;
 
-  // drawLine(
-  //   0,
-  //   0.1,
-  //   (180 * Math.pow(loudness, 1 / 4)) + 20,
-  //   (canvas.width / 2) - 1,
-  //   canvas.height / 2,
-  //   (canvas.width / 2) + 1,
-  //   canvas.height / 2
-  // );
-  // drawLine(
-  //   2,
-  //   0.5,
-  //   (160 * Math.pow(loudness, 1 / 4)) + 15,
-  //   (canvas.width / 2) - 1,
-  //   canvas.height / 2,
-  //   (canvas.width / 2) + 1,
-  //   canvas.height / 2
-  // );
+  drawLine(
+    0,
+    0.1,
+    (180 * Math.pow(loudness, 1 / 4)) + 20,
+    (canvas.width / 2) - 1,
+    canvas.height / 2,
+    (canvas.width / 2) + 1,
+    canvas.height / 2
+  );
+  drawLine(
+    2,
+    0.5,
+    (160 * Math.pow(loudness, 1 / 4)) + 15,
+    (canvas.width / 2) - 1,
+    canvas.height / 2,
+    (canvas.width / 2) + 1,
+    canvas.height / 2
+  );
 
   times(walkers.length, update);
 
-  ctx.fillStyle = 'rgba(128,128,128,1)';
+  ctx.fillStyle = 'rgba(32,32,32,1)';
   ctx.fillRect(1 - 1, 0, 1, canvas.height);
   ctx.fillRect(0, canvas.height - 1, canvas.width, 1);
   ctx.fillRect(canvas.width - 1, 0, 1, canvas.height);
